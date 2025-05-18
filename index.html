@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>电视直播</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet">
@@ -18,34 +18,51 @@
             <div class="player-container">
                 <div id="video-wrapper">
                     <video-js id="video-player" class="vjs-default-skin vjs-big-play-centered" controls preload="auto" autoplay>
-                        <p class="vjs-no-js">您的浏览器不支持HTML5视频播放，请升级浏览器或启用JavaScript。</p>
+                        <p class="vjs-no-js">
+                            您的浏览器不支持HTML5视频播放，可能的原因：<br>
+                            1. JavaScript未启用 - 请在浏览器设置中启用JavaScript<br>
+                            2. 浏览器版本过低 - 推荐使用：<br>
+                            · Chrome/Edge/Firefox最新版<br>
+                            · iOS 10+版本的Safari<br>
+                            · Android 5.0+的Chrome
+                        </p>
                     </video-js>
                 </div>
                 <div class="player-info">
                     <h2>正在播放: <span id="channel-name">TVB Plus</span></h2>
                     <p class="stream-status">直播状态: <span id="status-indicator">连接中...</span></p>
+                    <div id="browser-warning" class="browser-warning" style="display: none;">
+                        <p>检测到您的浏览器可能存在兼容性问题：</p>
+                        <ul id="warning-list"></ul>
+                        <p>建议采取以下措施：</p>
+                        <ul>
+                            <li>升级到最新版Chrome、Firefox或Edge浏览器</li>
+                            <li>iOS设备建议升级到iOS 10以上版本</li>
+                            <li>Android设备建议使用Chrome浏览器</li>
+                            <li>已自动切换到HLS格式以提供最佳兼容性</li>
+                        </ul>
+                    </div>
+                    <div id="error-message" class="browser-warning" style="display: none;">
+                        <p>播放出现问题：<span id="error-detail"></span></p>
+                        <ul id="error-solutions"></ul>
+                    </div>
                     <div class="format-switcher">
                         <span>播放格式：</span>
-                        <button class="btn format-btn active" data-format="flv">FLV</button>
+                        <button class="btn format-btn" data-format="m3u8">M3U8</button>
+                        <button class="btn format-btn" data-format="flv">FLV</button>
                         <button class="btn format-btn" data-format="dash">DASH</button>
-                        <button class="btn format-btn" data-format="hls">HLS</button>
                     </div>
                     <div class="channel-switcher">
-<<<<<<< HEAD
                         <button class="btn channel-btn" 
-                            data-url="https://live.tvfix.org/live/tvbplus/index.m3u8" 
-                            data-dash-url="https://live.tvfix.org/live/tvbplus/index.mpd"
-                            data-flv-url="https://live.tvfix.org/live/tvbplus/index.flv"
+                            data-url="https://rthktv33-live.akamaized.net/hls/live/2101641/RTHKTV33/master.m3u8" 
+                            data-dash-url="http://ali.hlspull.yximgs.com/live/qwt_feicui.mpd"
+                            data-flv-url="http://ali.hlspull.yximgs.com/live/qwt_feicui.flv"
                             data-name="TVB Plus">TVB Plus</button>
                         <button class="btn channel-btn" 
-                            data-url="https://stream1.freetv.fun/ad698c68f995a760534e836438ea8e8bc65abf16cd0ed1d6b8e005cd9b90913c.m3u8" 
-                            data-dash-url="https://stream1.freetv.fun/ad698c68f995a760534e836438ea8e8bc65abf16cd0ed1d6b8e005cd9b90913c.mpd"
-                            data-flv-url="https://stream1.freetv.fun/ad698c68f995a760534e836438ea8e8bc65abf16cd0ed1d6b8e005cd9b90913c.flv"
+                            data-url="https://rthktv33-live.akamaized.net/hls/live/2101641/RTHKTV33/master.m3u8" 
+                            data-dash-url="http://ali.hlspull.yximgs.com/live/qwt_feicui.mpd"
+                            data-flv-url="http://ali.hlspull.yximgs.com/live/qwt_feicui.flv"
                             data-name="翡翠台">翡翠台</button>
-=======
-                        <button class="btn channel-btn" data-url="https://live.tvfix.org/live/tvbplus/index.m3u8" data-name="TVB Plus">TVB Plus</button>
-                        <button class="btn channel-btn" data-url="https://stream1.freetv.fun/ad698c68f995a760534e836438ea8e8bc65abf16cd0ed1d6b8e005cd9b90913c.m3u8" data-name="翡翠台">翡翠台</button>
->>>>>>> aae0bb0b61252837e2751ca005389a53e44f5524
                     </div>
                 </div>
             </div>
@@ -71,9 +88,55 @@
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             const isOldiOS = isIOS && /OS [4-9]_\d/.test(navigator.userAgent);
             const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            const isIE = /MSIE|Trident/.test(navigator.userAgent);
+            const isOldAndroid = /Android/.test(navigator.userAgent) && (/Android [1-4]/.test(navigator.userAgent));
+            const isLegacyBrowser = isOldiOS || isIE || isOldAndroid;
+            
+            // 检查浏览器兼容性
+            const browserWarning = document.getElementById('browser-warning');
+            const warningList = document.getElementById('warning-list');
+            
+            if (isLegacyBrowser) {
+                browserWarning.style.display = 'block';
+                const warnings = [];
+                
+                if (isOldiOS) {
+                    warnings.push('检测到iOS 9或更低版本，部分功能可能受限');
+                }
+                if (isIE) {
+                    warnings.push('检测到IE浏览器，不支持现代视频编码和MSE技术');
+                }
+                if (isOldAndroid) {
+                    warnings.push('检测到Android 4.4或更低版本，播放性能可能受限');
+                }
+                
+                warningList.innerHTML = warnings.map(warning => `<li>${warning}</li>`).join('');
+                
+                // 自动选择M3U8格式（最大兼容性）
+                currentFormat = 'm3u8';
+                document.querySelectorAll('.format-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.format === 'm3u8') {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+            
+            // 检查JavaScript是否启用
+            if (typeof window.videojs === 'undefined') {
+                console.error('VideoJS未加载，请检查JavaScript是否启用');
+                showError('JavaScript未正确加载', [
+                    '请检查浏览器是否启用了JavaScript',
+                    '尝试刷新页面',
+                    '清除浏览器缓存后重试'
+                ]);
+                return;
+            }
             
             // 注册FLV插件
-            videojs.registerPlugin('flvjs', window.videojsFlvjs);
+            if (window.videojs && window.videojsFlvjs) {
+                videojs.registerPlugin('flvjs', window.videojsFlvjs);
+            }
             
             // 初始化video.js播放器
             const player = videojs('video-player', {
@@ -82,29 +145,61 @@
                     hls: {
                         overrideNative: !isOldiOS && !isSafari,
                         enableLowInitialPlaylist: true,
-                        smoothQualityChange: true
+                        smoothQualityChange: true,
+                        handleManifestRedirects: true,
+                        allowSeeksWithinUnsafeLiveWindow: true
                     },
                     flvjs: {
                         mediaDataSource: {
                             isLive: true,
                             cors: true,
                             withCredentials: false
+                        },
+                        config: {
+                            enableStashBuffer: false,
+                            stashInitialSize: 128
                         }
                     }
                 },
-                techOrder: ['html5', 'flvjs']
+                techOrder: isLegacyBrowser ? ['html5'] : ['html5', 'flvjs'],
+                sources: [{
+                    src: '',
+                    type: ''
+                }],
+                controls: true,
+                autoplay: true,
+                preload: 'auto',
+                errorDisplay: true,
+                loadingSpinner: true
             });
             
             // 加载插件
-            player.flvjs();
+            if (!isLegacyBrowser && window.videojs && window.videojsFlvjs) {
+                player.flvjs();
+            }
             
             const statusIndicator = document.getElementById('status-indicator');
             const channelName = document.getElementById('channel-name');
             const channelButtons = document.querySelectorAll('.channel-btn');
             const formatButtons = document.querySelectorAll('.format-btn');
+            const errorMessage = document.getElementById('error-message');
+            const errorDetail = document.getElementById('error-detail');
+            const errorSolutions = document.getElementById('error-solutions');
             
             // 当前选择的格式
-            let currentFormat = 'flv';
+            let currentFormat = isLegacyBrowser ? 'm3u8' : 'flv';
+            
+            function showError(message, solutions) {
+                errorDetail.textContent = message;
+                errorSolutions.innerHTML = solutions.map(solution => `<li>${solution}</li>`).join('');
+                errorMessage.style.display = 'block';
+                statusIndicator.textContent = '播放错误';
+                statusIndicator.className = 'error';
+            }
+            
+            function hideError() {
+                errorMessage.style.display = 'none';
+            }
             
             function getStreamType(url) {
                 const extension = url.split('.').pop().toLowerCase();
@@ -120,12 +215,13 @@
                 switch(currentFormat) {
                     case 'flv': return button.dataset.flvUrl;
                     case 'dash': return button.dataset.dashUrl;
-                    case 'hls': return button.dataset.url;
+                    case 'm3u8': return button.dataset.url;
                     default: return button.dataset.url;
                 }
             }
             
             function playStream(button) {
+                hideError();
                 const streamUrl = getStreamUrl(button);
                 const streamType = getStreamType(streamUrl);
                 
@@ -145,37 +241,85 @@
                 // 播放
                 player.play().catch(function(error) {
                     console.error('播放错误:', error);
-                    statusIndicator.textContent = '连接失败';
-                    statusIndicator.className = 'error';
+                    handlePlayError(error);
                 });
             }
             
-            // 监听播放状态
+            function handlePlayError(error) {
+                let errorMessage = '播放失败';
+                let solutions = [];
+                
+                switch(error.name) {
+                    case 'NotSupportedError':
+                        errorMessage = '当前浏览器不支持该视频格式';
+                        solutions = [
+                            '尝试切换到M3U8格式',
+                            '升级到最新版浏览器',
+                            '使用Chrome、Firefox或Edge浏览器'
+                        ];
+                        // 自动切换到M3U8格式
+                        if (currentFormat !== 'm3u8') {
+                            currentFormat = 'm3u8';
+                            document.querySelector('.format-btn[data-format="m3u8"]').click();
+                        }
+                        break;
+                    case 'NotAllowedError':
+                        errorMessage = '浏览器禁止自动播放';
+                        solutions = [
+                            '点击播放按钮手动开始播放',
+                            '检查浏览器自动播放设置'
+                        ];
+                        break;
+                    case 'NetworkError':
+                        errorMessage = '网络连接错误';
+                        solutions = [
+                            '检查网络连接',
+                            '尝试刷新页面',
+                            '稍后重试'
+                        ];
+                        break;
+                    default:
+                        solutions = [
+                            '尝试切换播放格式',
+                            '刷新页面重试',
+                            '检查网络连接'
+                        ];
+                }
+                
+                showError(errorMessage, solutions);
+            }
+            
+            // 播放状态监听
             player.on('playing', function() {
                 statusIndicator.textContent = '正在播放';
                 statusIndicator.className = 'playing';
+                hideError();
+            });
+            
+            player.on('waiting', function() {
+                statusIndicator.textContent = '缓冲中...';
+                statusIndicator.className = 'connecting';
             });
             
             player.on('error', function() {
-                statusIndicator.textContent = '连接失败';
-                statusIndicator.className = 'error';
+                const error = player.error();
+                handlePlayError(error);
             });
             
-            // 频道切换事件
-            channelButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    channelButtons.forEach(btn => btn.classList.remove('active'));
-                    this.classList.add('active');
-                    playStream(this);
-                });
-            });
-            
-            // 格式切换事件
+            // 格式切换按钮事件
             formatButtons.forEach(button => {
                 button.addEventListener('click', function() {
+                    if (isLegacyBrowser && button.dataset.format !== 'm3u8') {
+                        showError('浏览器不支持该格式', [
+                            '当前浏览器仅支持M3U8格式',
+                            '请升级浏览器以使用其他格式'
+                        ]);
+                        return;
+                    }
+                    
                     formatButtons.forEach(btn => btn.classList.remove('active'));
-                    this.classList.add('active');
-                    currentFormat = this.dataset.format;
+                    button.classList.add('active');
+                    currentFormat = button.dataset.format;
                     
                     // 重新加载当前频道
                     const activeChannel = document.querySelector('.channel-btn.active');
@@ -185,10 +329,17 @@
                 });
             });
             
+            // 频道切换按钮事件
+            channelButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    channelButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    playStream(button);
+                });
+            });
+            
             // 默认播放第一个频道
-            if (channelButtons.length > 0) {
-                channelButtons[0].click();
-            }
+            channelButtons[0].click();
         });
     </script>
 </body>

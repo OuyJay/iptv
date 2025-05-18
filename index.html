@@ -2,15 +2,24 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="format-detection" content="telephone=no">
   <title>呆萌恐龙IPTV - 简约好用的电视直播</title>
   <meta name="description" content="一个简约可爱的电视直播网站，支持多种直播源">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦖</text></svg>">
   
-  <!-- 引入Video.js CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/video.js@7.20.3/dist/video-js.min.css" rel="stylesheet">
-  <!-- 自定义CSS -->
-  <link rel="stylesheet" href="css/style.css">
+  <!-- iOS图标 -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦖</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦖</text></svg>">
+  
+  <!-- 播放器样式 -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.20.3/video-js.min.css" rel="stylesheet">
+  <link href="css/style.min.css" rel="stylesheet">
+  
+  <!-- 预加载关键资源 -->
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
 </head>
 <body>
   <!-- 网站标题栏 -->
@@ -87,13 +96,29 @@
     <p>© 2023 呆萌恐龙IPTV - Made with 💖</p>
   </footer>
   
-  <!-- 引入必要的库 -->
-  <script src="https://cdn.jsdelivr.net/npm/video.js@7.20.3/dist/video.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.12/dist/hls.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flv.js@1.6.2/dist/flv.min.js"></script>
-  <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
+  <!-- 优化的脚本加载 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.20.3/video.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.12/dist/hls.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/flv.js@1.6.2/dist/flv.min.js" defer></script>
+  <script src="js/app.min.js" defer></script>
   
-  <!-- 自定义JavaScript -->
-  <script src="js/app.js"></script>
+  <!-- iOS兼容性处理 -->
+  <script>
+    // 防止iOS设备上的触摸事件导致页面弹跳
+    document.addEventListener('touchmove', function(e) {
+      if (e.target.closest('.video-js, .channels-list') === null) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+    
+    // iOS设备上的自动播放处理
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+      document.addEventListener('DOMContentLoaded', function() {
+        const video = document.querySelector('video');
+        video.setAttribute('playsinline', '');
+        video.setAttribute('webkit-playsinline', '');
+      });
+    }
+  </script>
 </body>
 </html>

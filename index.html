@@ -1,85 +1,91 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>电视直播</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://cdn.jsdelivr.net/npm/video.js@7.20.3/dist/video-js.min.css" rel="stylesheet">
-    <link rel="shortcut icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABs0lEQVQ4T6WTzUtUURjGf+85904j+QEOOrkStElaSLkIbN1CaCG4aNGqjf+A9V9EC7dBixYtWgVCiwSDaFFC0EIUFJQiELKxGe+9574tzsy9jVMTRC/cxTnn/p7n/T7eI9y8EZWb+V9AVRj7u4inXX/h0upOgJYHbwFh9Nkh0mw9tWiBVlJrh0SqHlweI01HUYvWeHyxg7MzS0kuVeS7tVZrzbCGI5XVRGsSoi2I1iHefvz+5pqD93KMXBgyIcDlj/n81GyOLjVTHQjNTyC9AiOQo+J+wgQ63jygf+YFw6MzuGSV4S9ddL5/Sf/xNPH8IiRJ1pELUlEdkYmK6+qDLvqu3eLas310fLtH+0SUVlWkKUVCXsb3A8LQx/c8PM9DKYXEnuf18B0uTB2gZ+URwdM8VQcetVoYWDyfIO9TyAcUCz6FfI4gUEhlMF4Vs94b9Hz9RHLyPOG2VTwFTbUcOz/YRrF9B+FaDc/z8QMf51I8JaNaDMZZ8tZi0oy1dcPq2m/ixUXi3W50mmF0ijEGnWqM1lij/zqRRqQimUl5PPGVE5MTjM9+ZmzmCyuzc9nPBPwBDzOdNhafNjoAAAAASUVORK5CYII=" type="image/x-icon">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>简约电视直播</title>
+  <meta name="description" content="一个简约风格的电视直播网站，支持多种协议和设备">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📺</text></svg>">
+  
+  <!-- 引入Video.js CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/video.js@7.20.3/dist/video-js.min.css" rel="stylesheet">
+  <!-- 自定义CSS -->
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div class="loading-container" id="loadingContainer">
-        <div class="loading-spinner"></div>
-        <div class="loading-text">加载中...</div>
-    </div>
-
-    <div class="main-container" id="mainContainer" style="display: none;">
-        <header>
-            <h1>电视直播</h1>
-        </header>
+  <div class="container">
+    <!-- 播放器区域 -->
+    <section class="player-section">
+      <div class="player-wrapper" id="player-wrapper">
+        <video id="player" 
+               class="video-js vjs-default-skin vjs-big-play-centered"
+               playsinline
+               webkit-playsinline>
+          <p class="vjs-no-js">
+            要观看此视频，请启用JavaScript并考虑升级到支持HTML5视频的浏览器
+          </p>
+        </video>
         
-        <div class="content-container">
-            <!-- 左侧播放器区域 -->
-            <div class="player-section">
-                <div class="player-container">
-                    <video id="videoPlayer" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto">
-                        <p class="vjs-no-js">
-                            要观看此视频，请启用JavaScript并考虑升级到支持HTML5视频的浏览器
-                        </p>
-                    </video>
-                </div>
-                
-                <!-- 播放器下方控制区 -->
-                <div class="player-controls">
-                    <div class="control-row">
-                        <div class="source-selector">
-                            <label for="sourceSelect">信号源:</label>
-                            <select id="sourceSelect" class="source-select">
-                                <option value="" disabled selected>选择信号源</option>
-                            </select>
-                        </div>
-                        
-                        <div class="quality-selector">
-                            <label for="qualitySelect">画质:</label>
-                            <select id="qualitySelect" class="quality-select">
-                                <option value="auto" selected>自动画质</option>
-                                <option value="high">高清</option>
-                                <option value="medium">标清</option>
-                                <option value="low">流畅</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 右侧频道列表区域 -->
-            <div class="channels-section">
-                <div class="channel-search">
-                    <select id="channelSelect" class="channel-select">
-                        <option value="" disabled selected>选择频道</option>
-                    </select>
-                </div>
-                
-                <div class="channel-list">
-                    <div class="category-tabs" id="categoryTabs"></div>
-                    <div class="channels-grid" id="channelsGrid"></div>
-                </div>
-            </div>
+        <!-- 加载中提示 -->
+        <div id="loading-overlay" class="loading-overlay">加载中...</div>
+      </div>
+      
+      <div class="player-info">
+        <h1 id="channel-title" class="channel-title">请选择频道</h1>
+        <div id="error-message" class="error-message" style="display: none;"></div>
+      </div>
+      
+      <div class="player-controls">
+        <button id="retry-btn" class="btn">重试</button>
+        <button id="source-btn" class="btn">切换源</button>
+        <button id="fullscreen-btn" class="btn btn-secondary">全屏</button>
+        
+        <div class="tooltip">
+          <span class="tooltip-text">当前版本: 1.0.0</span>
+          <span style="margin-left: auto; font-size: 12px; color: #888;">简约电视直播</span>
         </div>
-    </div>
-
-    <footer>
-        <p>基于 GitHub Pages 搭建 | <a href="https://github.com/yourname/tv-live" target="_blank">开源项目</a></p>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/video.js@7.20.3/dist/video.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-hls.js@latest/dist/videojs-contrib-hlsjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-quality-levels@latest/dist/videojs-contrib-quality-levels.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flv.js@latest/dist/flv.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/videojs-flvjs@latest/dist/videojs-flvjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dash.js@latest/dist/dash.all.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/videojs-dash@latest/dist/videojs-dash.min.js"></script>
-    <script src="js/app.js"></script>
+      </div>
+    </section>
+    
+    <!-- 频道列表区域 -->
+    <section class="channels-section">
+      <!-- 新增：搜索框 -->
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="搜索频道...">
+        <button id="search-btn" class="btn">
+          <svg viewBox="0 0 24 24" width="16" height="16">
+            <path fill="currentColor" d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- 新增：功能按钮组 -->
+      <div class="function-buttons">
+        <button id="favorite-btn" class="btn btn-icon" title="收藏">
+          <span class="icon">❤</span>
+        </button>
+        <button id="history-btn" class="btn btn-icon" title="历史记录">
+          <span class="icon">⏱</span>
+        </button>
+      </div>
+      
+      <div id="category-tabs" class="category-tabs">
+        <!-- 分类标签将通过JavaScript动态生成 -->
+      </div>
+      
+      <div id="channels-list" class="channels-list">
+        <!-- 频道列表将通过JavaScript动态生成 -->
+      </div>
+    </section>
+  </div>
+  
+  <!-- 引入必要的库 -->
+  <script src="https://cdn.jsdelivr.net/npm/video.js@7.20.3/dist/video.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.12/dist/hls.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flv.js@1.6.2/dist/flv.min.js"></script>
+  <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
+  
+  <!-- 自定义JavaScript -->
+  <script src="js/app.js"></script>
 </body>
-</html> 
+</html>

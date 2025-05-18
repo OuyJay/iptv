@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>电视直播</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
@@ -16,14 +17,30 @@
         <main>
             <div class="player-container">
                 <div id="video-wrapper">
-                    <video id="video-player" controls autoplay></video>
+                    <video-js id="video-player" class="vjs-default-skin vjs-big-play-centered" controls preload="auto" autoplay>
+                        <p class="vjs-no-js">您的浏览器不支持HTML5视频播放，请升级浏览器或启用JavaScript。</p>
+                    </video-js>
                 </div>
                 <div class="player-info">
                     <h2>正在播放: <span id="channel-name">TVB Plus</span></h2>
                     <p class="stream-status">直播状态: <span id="status-indicator">连接中...</span></p>
+                    <div class="format-switcher">
+                        <span>播放格式：</span>
+                        <button class="btn format-btn active" data-format="flv">FLV</button>
+                        <button class="btn format-btn" data-format="dash">DASH</button>
+                        <button class="btn format-btn" data-format="hls">HLS</button>
+                    </div>
                     <div class="channel-switcher">
-                        <button class="btn channel-btn" data-url="https://live.tvfix.org/live/tvbplus/index.m3u8" data-name="TVB Plus">TVB Plus</button>
-                        <button class="btn channel-btn" data-url="https://stream1.freetv.fun/ad698c68f995a760534e836438ea8e8bc65abf16cd0ed1d6b8e005cd9b90913c.m3u8" data-name="直播源 2">直播源 2</button>
+                        <button class="btn channel-btn" 
+                            data-url="https://live.tvfix.org/live/tvbplus/index.m3u8" 
+                            data-dash-url="https://live.tvfix.org/live/tvbplus/index.mpd"
+                            data-flv-url="https://live.tvfix.org/live/tvbplus/index.flv"
+                            data-name="TVB Plus">TVB Plus</button>
+                        <button class="btn channel-btn" 
+                            data-url="https://stream1.freetv.fun/ad698c68f995a760534e836438ea8e8bc65abf16cd0ed1d6b8e005cd9b90913c.m3u8" 
+                            data-dash-url="https://stream1.freetv.fun/ad698c68f995a760534e836438ea8e8bc65abf16cd0ed1d6b8e005cd9b90913c.mpd"
+                            data-flv-url="https://stream1.freetv.fun/ad698c68f995a760534e836438ea8e8bc65abf16cd0ed1d6b8e005cd9b90913c.flv"
+                            data-name="翡翠台">翡翠台</button>
                     </div>
                 </div>
             </div>
@@ -34,86 +51,139 @@
         </footer>
     </div>
     
-    <!-- 引入hls.js库用于播放m3u8格式的直播流 -->
+    <!-- 播放器相关库 -->
+    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-hls.js@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-dash@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flv.js@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/videojs-flvjs-es6@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dash.js@latest"></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const video = document.getElementById('video-player');
+            // 浏览器和设备检测
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isOldiOS = isIOS && /OS [4-9]_\d/.test(navigator.userAgent);
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            
+            // 注册FLV插件
+            videojs.registerPlugin('flvjs', window.videojsFlvjs);
+            
+            // 初始化video.js播放器
+            const player = videojs('video-player', {
+                fluid: true,
+                html5: {
+                    hls: {
+                        overrideNative: !isOldiOS && !isSafari,
+                        enableLowInitialPlaylist: true,
+                        smoothQualityChange: true
+                    },
+                    flvjs: {
+                        mediaDataSource: {
+                            isLive: true,
+                            cors: true,
+                            withCredentials: false
+                        }
+                    }
+                },
+                techOrder: ['html5', 'flvjs']
+            });
+            
+            // 加载插件
+            player.flvjs();
+            
             const statusIndicator = document.getElementById('status-indicator');
             const channelName = document.getElementById('channel-name');
             const channelButtons = document.querySelectorAll('.channel-btn');
-            let hls = null;
-
-            function playStream(url, name) {
-                if (hls) {
-                    hls.destroy();
-                }
-                
-                channelName.textContent = name;
-                statusIndicator.textContent = '连接中...';
-                statusIndicator.className = '';
-                
-                if (Hls.isSupported()) {
-                    hls = new Hls();
-                    hls.loadSource(url);
-                    hls.attachMedia(video);
-                    
-                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                        video.play();
-                        statusIndicator.textContent = '正在播放';
-                        statusIndicator.className = 'status-playing';
-                    });
-                    
-                    hls.on(Hls.Events.ERROR, function(event, data) {
-                        if (data.fatal) {
-                            statusIndicator.textContent = '连接错误';
-                            statusIndicator.className = 'status-error';
-                            switch(data.type) {
-                                case Hls.ErrorTypes.NETWORK_ERROR:
-                                    hls.startLoad();
-                                    break;
-                                case Hls.ErrorTypes.MEDIA_ERROR:
-                                    hls.recoverMediaError();
-                                    break;
-                                default:
-                                    hls.destroy();
-                                    break;
-                            }
-                        }
-                    });
-                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                    video.src = url;
-                    video.addEventListener('loadedmetadata', function() {
-                        video.play();
-                        statusIndicator.textContent = '正在播放';
-                        statusIndicator.className = 'status-playing';
-                    });
-                    
-                    video.addEventListener('error', function() {
-                        statusIndicator.textContent = '连接错误';
-                        statusIndicator.className = 'status-error';
-                    });
-                } else {
-                    statusIndicator.textContent = '浏览器不支持';
-                    statusIndicator.className = 'status-error';
+            const formatButtons = document.querySelectorAll('.format-btn');
+            
+            // 当前选择的格式
+            let currentFormat = 'flv';
+            
+            function getStreamType(url) {
+                const extension = url.split('.').pop().toLowerCase();
+                switch(extension) {
+                    case 'flv': return 'video/x-flv';
+                    case 'mpd': return 'application/dash+xml';
+                    case 'm3u8': return 'application/x-mpegURL';
+                    default: return 'application/x-mpegURL';
                 }
             }
-
-            // 为每个频道按钮添加点击事件
+            
+            function getStreamUrl(button) {
+                switch(currentFormat) {
+                    case 'flv': return button.dataset.flvUrl;
+                    case 'dash': return button.dataset.dashUrl;
+                    case 'hls': return button.dataset.url;
+                    default: return button.dataset.url;
+                }
+            }
+            
+            function playStream(button) {
+                const streamUrl = getStreamUrl(button);
+                const streamType = getStreamType(streamUrl);
+                
+                // 更新播放源
+                player.src({
+                    src: streamUrl,
+                    type: streamType
+                });
+                
+                // 更新频道名称
+                channelName.textContent = button.dataset.name;
+                
+                // 更新状态
+                statusIndicator.textContent = '连接中...';
+                statusIndicator.className = 'connecting';
+                
+                // 播放
+                player.play().catch(function(error) {
+                    console.error('播放错误:', error);
+                    statusIndicator.textContent = '连接失败';
+                    statusIndicator.className = 'error';
+                });
+            }
+            
+            // 监听播放状态
+            player.on('playing', function() {
+                statusIndicator.textContent = '正在播放';
+                statusIndicator.className = 'playing';
+            });
+            
+            player.on('error', function() {
+                statusIndicator.textContent = '连接失败';
+                statusIndicator.className = 'error';
+            });
+            
+            // 频道切换事件
             channelButtons.forEach(button => {
                 button.addEventListener('click', function() {
-                    const url = this.dataset.url;
-                    const name = this.dataset.name;
-                    playStream(url, name);
-                    
-                    // 更新按钮状态
                     channelButtons.forEach(btn => btn.classList.remove('active'));
                     this.classList.add('active');
+                    playStream(this);
                 });
             });
-
+            
+            // 格式切换事件
+            formatButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    formatButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFormat = this.dataset.format;
+                    
+                    // 重新加载当前频道
+                    const activeChannel = document.querySelector('.channel-btn.active');
+                    if (activeChannel) {
+                        playStream(activeChannel);
+                    }
+                });
+            });
+            
             // 默认播放第一个频道
-            channelButtons[0].click();
+            if (channelButtons.length > 0) {
+                channelButtons[0].click();
+            }
         });
     </script>
 </body>

@@ -74,96 +74,77 @@ function initDomElements() {
 
 // 初始化Video.js播放器
 function initPlayer() {
-  const playerOptions = {
+  player = videojs('player', {
     autoplay: false,
     fluid: true,
     aspectRatio: '16:9',
-    preload: 'metadata', // 改为metadata以加快加载
+    preload: 'auto',
     controls: true,
     controlBar: {
       children: [
         'playToggle',
         'volumePanel',
-        'currentTimeDisplay',
         'progressControl',
+        'currentTimeDisplay',
+        'timeDivider',
+        'durationDisplay',
         'fullscreenToggle'
       ]
     },
     html5: {
       hls: {
-        overrideNative: !videojs.browser.IS_IOS, // iOS使用原生HLS
-        enableLowInitialPlaylist: true,
-        limitRenditionByPlayerDimensions: true,
-        smoothQualityChange: true
+        overrideNative: true,
+        enableLowInitialPlaylist: true
       },
-      nativeAudioTracks: videojs.browser.IS_IOS,
-      nativeVideoTracks: videojs.browser.IS_IOS
-    },
-    sources: [] // 初始为空
-  };
-
-  player = videojs('player', playerOptions);
+      nativeAudioTracks: false,
+      nativeVideoTracks: false
+    }
+  });
   
   // 添加错误处理
   player.on('error', handlePlayerError);
   
-  // 优化加载状态处理
-  player.on('loadstart', () => showLoading('正在加载...'));
-  player.on('loadedmetadata', () => hideLoading());
-  player.on('playing', () => {
-    hideLoading();
-    hideError();
-  });
-  
-  // 添加自动重连机制
-  player.on('waiting', () => {
-    const waitingTimeout = setTimeout(() => {
-      if (player.readyState() < 3) {
-        retryPlayback();
-      }
-    }, 10000); // 10秒后如果还在等待则重试
-    
-    player.one('playing', () => clearTimeout(waitingTimeout));
-  });
+  // 添加加载状态处理
+  player.on('loadstart', () => showLoading('正在加载直播源...'));
+  player.on('loadeddata', hideLoading);
+  player.on('playing', hideLoading);
 }
 
 // 加载频道数据
 async function loadChannelData() {
-  showLoading('加载频道列表...');
+  const maxRetries = 3;
+  let retryCount = 0;
   
-  try {
-    // 加载内联的channels数据
-    const response = await fetch('./data/channels.json');
-    if (!response.ok) {
-      throw new Error(`HTTP错误: ${response.status}`);
-    }
-    const data = await response.json();
-    
-    if (!data || !data.categories) {
-      throw new Error('频道数据格式无效');
-    }
-    
-    categories = data.categories;
-    processChannelData();
-    hideLoading();
-    
-  } catch (error) {
-    console.error('加载频道数据错误:', error);
-    // 如果加载失败，尝试使用备用数据源
+  async function tryLoadData() {
     try {
-      const response = await fetch('https://raw.githubusercontent.com/你的用户名/你的仓库名/main/data/channels.json');
+      showLoading('加载频道列表...');
+      
+      const response = await fetch('./data/channels.json');
       if (!response.ok) {
-        throw new Error('备用数据源也无法访问');
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
       const data = await response.json();
-      categories = data.categories;
+      hideLoading();
+      
+      categories = data.categories || [];
       processChannelData();
-      hideLoading();
-    } catch (backupError) {
-      hideLoading();
-      showError(`加载频道失败，请检查网络连接后重试。${error.message}`);
+      
+    } catch (error) {
+      console.error('加载频道数据错误:', error);
+      
+      if (retryCount < maxRetries) {
+        retryCount++;
+        showLoading(`加载失败，正在重试 (${retryCount}/${maxRetries})...`);
+        setTimeout(tryLoadData, 1000 * retryCount);
+      } else {
+        hideLoading();
+        showError(`加载频道数据失败，请刷新页面重试。错误信息: ${error.message}`);
+      }
     }
   }
+  
+  await tryLoadData();
 }
 
 // 处理频道数据
@@ -172,34 +153,33 @@ function processChannelData() {
     showError('没有可用的频道分类');
     return;
   }
-
+  
   // 提取所有频道
-  allChannels = categories.reduce((acc, category) => {
-    if (category.channels && Array.isArray(category.channels)) {
-      return acc.concat(category.channels);
+  allChannels = [];
+  categories.forEach(category => {
+    if (category.channels && category.channels.length > 0) {
+      allChannels = allChannels.concat(category.channels);
     }
-    return acc;
-  }, []);
-
-  // 检查和过滤无效的频道
-  allChannels = allChannels.filter(channel => {
-    const isValid = channel && channel.name && 
-                   Array.isArray(channel.sources) && 
-                   channel.sources.length > 0;
-    if (!isValid) {
-      console.warn('发现无效的频道数据:', channel);
-    }
-    return isValid;
   });
-
-  // 检查是否有可用频道
+  
+  // 检查频道数据的完整性
+  allChannels = allChannels.filter(channel => {
+    if (!channel.name || !channel.sources || channel.sources.length === 0) {
+      console.warn('发现无效的频道数据:', channel);
+      return false;
+    }
+    return true;
+  });
+  
   if (allChannels.length === 0) {
     showError('没有可用的频道');
     return;
   }
-
-  // 渲染界面
+  
+  // 渲染分类标签
   renderCategoryTabs();
+  
+  // 默认选择第一个分类
   if (categories.length > 0) {
     selectCategory(categories[0].name);
   }
@@ -367,7 +347,7 @@ function selectBestSource(channel) {
   playSource(bestSource);
 }
 
-// 优化的播放源选择逻辑
+// 播放指定直播源
 function playSource(source) {
   if (!source) {
     hideLoading();
@@ -378,78 +358,55 @@ function playSource(source) {
   const type = source.type.toLowerCase();
   const url = source.url;
   
+  // 重置播放器
+  player.reset();
+  
   try {
-    if (type === 'hls') {
-      if (videojs.browser.IS_IOS) {
-        // iOS设备使用原生HLS播放
+    switch (type) {
+      case 'hls':
+        if (Hls.isSupported()) {
+          const hls = new Hls();
+          hls.loadSource(url);
+          hls.attachMedia(player.tech({ IWillNotUseThisInPlugins: true }).el());
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            player.play();
+          });
+        } else if (player.canPlayType('application/vnd.apple.mpegurl')) {
+          player.src({
+            src: url,
+            type: 'application/x-mpegURL'
+          });
+          player.play();
+        }
+        break;
+      
+      case 'flv':
+        if (flvjs && flvjs.isSupported()) {
+          const flvPlayer = flvjs.createPlayer({
+            type: 'flv',
+            url: url,
+            isLive: true
+          });
+          flvPlayer.attachMediaElement(player.tech({ IWillNotUseThisInPlugins: true }).el());
+          flvPlayer.load();
+          player.play();
+        } else {
+          showError('您的浏览器不支持FLV格式');
+        }
+        break;
+      
+      default:
         player.src({
           src: url,
           type: 'application/x-mpegURL'
         });
-      } else if (Hls.isSupported()) {
-        // 其他设备使用HLS.js
-        const hls = new Hls({
-          maxBufferLength: 30,
-          maxMaxBufferLength: 60,
-          manifestLoadingTimeOut: 10000,
-          manifestLoadingMaxRetry: 3,
-          levelLoadingTimeOut: 10000,
-          levelLoadingMaxRetry: 3
-        });
-        
-        hls.loadSource(url);
-        hls.attachMedia(player.tech({ IWillNotUseThisInPlugins: true }).el());
-        hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          player.play().catch(() => {
-            // 自动播放失败，显示播放按钮
-            player.bigPlayButton.show();
-          });
-        });
-        
-        // 错误处理
-        hls.on(Hls.Events.ERROR, (event, data) => {
-          if (data.fatal) {
-            switch (data.type) {
-              case Hls.ErrorTypes.NETWORK_ERROR:
-                console.log('重新尝试加载直播源...');
-                hls.startLoad();
-                break;
-              case Hls.ErrorTypes.MEDIA_ERROR:
-                console.log('重新尝试解码...');
-                hls.recoverMediaError();
-                break;
-              default:
-                retryPlayback();
-                break;
-            }
-          }
-        });
-      }
-    } else if (type === 'flv' && flvjs && flvjs.isSupported()) {
-      const flvPlayer = flvjs.createPlayer({
-        type: 'flv',
-        url: url,
-        isLive: true,
-        hasAudio: true,
-        hasVideo: true,
-        enableStashBuffer: false
-      });
-      
-      flvPlayer.attachMediaElement(player.tech({ IWillNotUseThisInPlugins: true }).el());
-      flvPlayer.load();
-      player.play();
-    } else {
-      // 降级使用普通播放器
-      player.src({
-        src: url,
-        type: type === 'hls' ? 'application/x-mpegURL' : 'video/mp4'
-      });
+        player.play();
     }
     
     hideError();
   } catch (error) {
     console.error('播放器错误:', error);
-    retryPlayback();
+    handlePlayerError(error);
   }
 }
 
@@ -504,22 +461,6 @@ function handlePlayerError(error) {
   } else {
     hideLoading();
     showError('播放失败，请检查网络连接或点击重试按钮');
-  }
-}
-
-// 重试播放
-function retryPlayback() {
-  if (retryCount < MAX_RETRIES) {
-    retryCount++;
-    showLoading(`加载失败，正在重试 (${retryCount}/${MAX_RETRIES})...`);
-    setTimeout(() => {
-      if (currentChannel) {
-        playChannel(currentChannel);
-      }
-    }, 2000);
-  } else {
-    hideLoading();
-    showError('播放失败，请切换其他直播源或检查网络连接');
   }
 }
 

@@ -12,40 +12,48 @@
 - **免费部署**：利用 GitHub Pages 免费部署，无需服务器
 - **响应式设计**：自适应各种屏幕尺寸，优化移动端体验
 
-## 技术栈
+## 本地运行指南
 
-- **前端**：纯 HTML/CSS/JavaScript（无框架依赖，兼容老旧浏览器）
-- **播放器**：Video.js（支持 HLS/DASH/FLV 多协议，含自动设备检测）
-- **直播源管理**：JSON 格式存储直播源，支持跨平台调用
+### 方法一：使用 Python（推荐）
 
-## 快速部署
+1. 确保安装了 Python 3
+2. 在项目根目录运行命令：
+```bash
+# Python 3
+python3 -m http.server
 
-### 通过 GitHub 部署
+# 如果你的系统默认是 Python 3，也可以使用：
+python -m http.server
+```
+3. 在浏览器中访问: `http://localhost:8000`
+
+### 方法二：使用 Node.js
+
+1. 确保安装了 Node.js
+2. 全局安装 http-server:
+```bash
+npm install -g http-server
+```
+3. 在项目根目录运行:
+```bash
+http-server -p 8000
+```
+4. 在浏览器中访问: `http://localhost:8000`
+
+### 方法三：使用 PHP（适用于 macOS 用户）
+
+macOS 自带 PHP，可以直接运行:
+```bash
+php -S localhost:8000
+```
+
+## 部署到 GitHub Pages
 
 1. Fork 本仓库到你的 GitHub 账号
 2. 进入仓库设置 (Settings)
 3. 找到 "Pages" 选项
 4. 将 Source 设置为 "main" 分支，点击保存
 5. 等待几分钟后，你的网站将可通过 `https://[你的用户名].github.io/[仓库名]` 访问
-
-### 本地测试
-
-1. 克隆本仓库到本地
-```bash
-git clone https://github.com/[你的用户名]/[仓库名].git
-cd [仓库名]
-```
-
-2. 使用任意 HTTP 服务器启动项目。例如，使用 Python：
-```bash
-# Python 3
-python -m http.server
-
-# Python 2
-python -m SimpleHTTPServer
-```
-
-3. 访问 `http://localhost:8000` 查看效果
 
 ## 自定义频道
 
@@ -92,18 +100,43 @@ python -m SimpleHTTPServer
 
 注意：每个信号源至少提供一种格式的URL。建议至少提供HLS格式，因为兼容性最好。
 
-## 获取直播源
+## 常见问题解决
 
-请确保你使用的直播源拥有合法的播放权利。以下是一些获取直播源的方法：
+### 网站无法加载
 
-1. IPTV提供商的公开直播源
-2. 各电视台官方网站提供的直播流
-3. 开源的IPTV资源
+1. **检查服务是否正常运行**
+   - 确保本地服务器命令执行成功且没有报错
+   - 确认访问的URL正确（http://localhost:8000）
+
+2. **控制台错误检查**
+   - 在浏览器中按F12打开开发者工具
+   - 查看Console标签中是否有错误信息
+   - 如有关于跨域(CORS)的错误，可能是直播源不允许跨域访问
+
+3. **资源加载问题**
+   - 检查网络连接是否正常
+   - 确认channels.json文件格式正确且没有语法错误
+
+### 视频无法播放
+
+1. **检查直播源有效性**
+   - 确认channels.json中的URL是否可访问
+   - 尝试在VLC等播放器中直接打开直播源URL测试
+
+2. **协议兼容性问题**
+   - 不同设备支持的协议不同，确保提供多种格式的直播源
+   - iOS设备优先使用HLS (.m3u8)格式
+   - 旧版浏览器优先使用MP4格式
+
+3. **网络限制问题**
+   - 某些网络环境可能限制视频流量
+   - 部分直播源可能限制了地理位置访问
 
 ## 自定义界面
 
 - 修改 `css/style.css` 文件来自定义网站的样式
 - 修改 `index.html` 文件来调整网站的结构
+- 修改 `js/app.js` 文件来调整功能逻辑
 
 ## 注意事项
 

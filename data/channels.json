@@ -1,0 +1,339 @@
+{
+  "categories": [
+    {
+      "name": "央视频道",
+      "channels": [
+        {
+          "name": "CCTV-1 综合",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "https://live-play.cctvnews.cctv.com/cctv/merge_cctv1.m3u8"
+            },
+            {
+              "type": "flv",
+              "url": "https://live-play.cctvnews.cctv.com/cctv/merge_cctv1.flv"
+            },
+            {
+              "type": "hls",
+              "url": "http://[2409:8087:3869:8021:1001::e5]:6610/PLTV/88888910/224/3221225642/index.m3u8"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/6/65/CCTV-1_Logo.png"
+        },
+        {
+          "name": "CCTV-2 财经",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://39.134.24.162/dbiptv.sn.chinamobile.com/PLTV/88888890/224/3221226195/index.m3u8"
+            },
+            {
+              "type": "hls",
+              "url": "http://[2409:8087:3869:8021:1001::e5]:6610/PLTV/88888910/224/3221225643/index.m3u8"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/c/ce/CCTV-2_Logo.png"
+        },
+        {
+          "name": "CCTV-3 综艺",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://39.134.24.166/dbiptv.sn.chinamobile.com/PLTV/88888890/224/3221226397/index.m3u8"
+            },
+            {
+              "type": "hls",
+              "url": "http://[2409:8087:3869:8021:1001::e5]:6610/PLTV/88888910/224/3221225634/index.m3u8"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/3/34/CCTV-3_Logo.png"
+        },
+        {
+          "name": "CCTV-4 国际",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://39.134.24.161/dbiptv.sn.chinamobile.com/PLTV/88888890/224/3221226191/index.m3u8"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/0/07/CCTV-4_Logo.png"
+        },
+        {
+          "name": "CCTV-5 体育",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://39.134.24.162/dbiptv.sn.chinamobile.com/PLTV/88888890/224/3221226395/index.m3u8"
+            },
+            {
+              "type": "hls",
+              "url": "http://[2409:8087:3869:8021:1001::e5]:6610/PLTV/88888910/224/3221225633/index.m3u8"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/3/33/CCTV-5_Logo.png"
+        },
+        {
+          "name": "CCTV-5+ 体育赛事",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://39.134.24.166/dbiptv.sn.chinamobile.com/PLTV/88888890/224/3221225761/index.m3u8"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/9/90/CCTV-5%2B_Logo.png"
+        },
+        {
+          "name": "CCTV-6 电影",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://39.134.24.166/dbiptv.sn.chinamobile.com/PLTV/88888890/224/3221226393/index.m3u8"
+            },
+            {
+              "type": "hls",
+              "url": "http://[2409:8087:3869:8021:1001::e5]:6610/PLTV/88888910/224/3221225632/index.m3u8"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/0/0c/CCTV-6_Logo.png"
+        },
+        {
+          "name": "CCTV-8 电视剧",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://39.134.24.162/dbiptv.sn.chinamobile.com/PLTV/88888890/224/3221226012/index.m3u8"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/4/49/CCTV-8_Logo.png"
+        },
+        {
+          "name": "CCTV-13 新闻",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "https://live-play.cctvnews.cctv.com/cctv/merge_cctv13.m3u8"
+            },
+            {
+              "type": "flv",
+              "url": "https://live-play.cctvnews.cctv.com/cctv/merge_cctv13.flv"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/0/0b/CCTV-13_Logo.png"
+        },
+        {
+          "name": "CCTV-14 少儿",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://39.134.24.166/dbiptv.sn.chinamobile.com/PLTV/88888890/224/3221226193/index.m3u8"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/c/c8/CCTV-14_Logo.png"
+        },
+        {
+          "name": "CCTV-15 音乐",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://39.134.24.162/dbiptv.sn.chinamobile.com/PLTV/88888890/224/3221225785/index.m3u8"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/f/f8/CCTV-15_Logo.png"
+        }
+      ]
+    },
+    {
+      "name": "卫视频道",
+      "channels": [
+        {
+          "name": "湖南卫视",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://39.134.24.162/dbiptv.sn.chinamobile.com/PLTV/88888890/224/3221225745/index.m3u8"
+            },
+            {
+              "type": "hls",
+              "url": "http://[2409:8087:3869:8021:1001::e5]:6610/PLTV/88888910/224/3221225704/index.m3u8"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/1/10/Hunan_TV.png"
+        },
+        {
+          "name": "江苏卫视",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://39.134.24.166/dbiptv.sn.chinamobile.com/PLTV/88888890/224/3221226200/index.m3u8"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/7/75/Jiangsu_Broadcasting.png"
+        },
+        {
+          "name": "浙江卫视",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://39.134.24.166/dbiptv.sn.chinamobile.com/PLTV/88888890/224/3221225798/index.m3u8"
+            },
+            {
+              "type": "hls",
+              "url": "http://[2409:8087:3869:8021:1001::e5]:6610/PLTV/88888910/224/3221225703/index.m3u8"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/0/0f/Zhejiang_TV_logo.png"
+        },
+        {
+          "name": "东方卫视",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://39.134.24.166/dbiptv.sn.chinamobile.com/PLTV/88888890/224/3221226217/index.m3u8"
+            },
+            {
+              "type": "hls",
+              "url": "http://[2409:8087:3869:8021:1001::e5]:6610/PLTV/88888910/224/3221225659/index.m3u8"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/thumb/a/a0/Dragon_Television_%28China%29_Logo.svg/1200px-Dragon_Television_%28China%29_Logo.svg.png"
+        },
+        {
+          "name": "北京卫视",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://39.134.24.162/dbiptv.sn.chinamobile.com/PLTV/88888890/224/3221225796/index.m3u8"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/e/e0/Beijing_Television_Logo.png"
+        },
+        {
+          "name": "广东卫视",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://39.134.24.166/dbiptv.sn.chinamobile.com/PLTV/88888890/224/3221226216/index.m3u8"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/thumb/d/d8/GRT_Satellite_Channel_logo.svg/1200px-GRT_Satellite_Channel_logo.svg.png"
+        },
+        {
+          "name": "安徽卫视",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://39.134.24.162/dbiptv.sn.chinamobile.com/PLTV/88888890/224/3221226203/index.m3u8"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/1/15/Anhui_Television.png"
+        },
+        {
+          "name": "深圳卫视",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://39.134.24.166/dbiptv.sn.chinamobile.com/PLTV/88888890/224/3221226205/index.m3u8"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/thumb/8/8c/Shenzhen_Media_Group_Logo.png/220px-Shenzhen_Media_Group_Logo.png"
+        }
+      ]
+    },
+    {
+      "name": "港澳台频道",
+      "channels": [
+        {
+          "name": "凤凰卫视中文",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://play-live.ifeng.com/live/06OLEGEGM4G.m3u8"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/thumb/3/34/Phoenix_Chinese.svg/1200px-Phoenix_Chinese.svg.png"
+        },
+        {
+          "name": "凤凰卫视资讯",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://play-live.ifeng.com/live/06OLEEWQKN4.m3u8"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/thumb/1/16/Phoenix_InfoNews.svg/1200px-Phoenix_InfoNews.svg.png"
+        },
+        {
+          "name": "TVB翡翠台",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://116.199.5.51:8114/00000000/index.m3u8?Fsv_CMSID=&Fsv_SV_PARAM1=0&Fsv_ShiftEnable=0&Fsv_ShiftTsp=0&Fsv_chan_hls_se_idx=188&Fsv_cid=0&Fsv_ctype=LIVES&Fsv_ctype=LIVES&Fsv_filetype=1&Fsv_otype=1&Fsv_otype=1&Fsv_rate_id=0&FvSeid=5abd1660af1babb4&Pcontent_id=&Provider_id="
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Jade_TV_logo.svg/1200px-Jade_TV_logo.svg.png"
+        }
+      ]
+    },
+    {
+      "name": "地方频道",
+      "channels": [
+        {
+          "name": "上海新闻综合",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://183.207.255.188/live/program/live/xwzhhd/4000000/mnf.m3u8"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/b/b9/SMG_News.png"
+        },
+        {
+          "name": "上海第一财经",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://183.207.255.188/live/program/live/dycjhd/4000000/mnf.m3u8"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/thumb/7/7f/Shanghai_white_new_logo.png/220px-Shanghai_white_new_logo.png"
+        }
+      ]
+    },
+    {
+      "name": "轮播频道",
+      "channels": [
+        {
+          "name": "CHC动作电影",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://[2409:8087:7000:20:1000::22]:6060/yinhe/2/ch00000090990000002055/index.m3u8?virtualDomain=yinhe.live_hls.zte.com"
+            }
+          ],
+          "logo": "https://upload.wikimedia.org/wikipedia/zh/8/8c/CHC_Action_Movie_Channel_Logo.png"
+        },
+        {
+          "name": "周星驰电影",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://mmitv.top/test/douyu.php?id=122402"
+            }
+          ],
+          "logo": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>"
+        },
+        {
+          "name": "林正英电影",
+          "sources": [
+            {
+              "type": "hls",
+              "url": "http://mmitv.top/test/douyu.php?id=218859"
+            }
+          ],
+          "logo": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧟</text></svg>"
+        }
+      ]
+    }
+  ]
+}

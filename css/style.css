@@ -1,0 +1,296 @@
+/* 全局样式 */
+:root {
+  --primary-color: #007AFF;
+  --secondary-color: #5856D6;
+  --background-color: #F2F2F7;
+  --card-bg: #FFFFFF;
+  --text-color: #1C1C1E;
+  --text-secondary: #8E8E93;
+  --border-color: #E5E5EA;
+  --error-color: #FF3B30;
+  --success-color: #34C759;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  line-height: 1.5;
+}
+
+/* 布局 */
+.container {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 24px;
+  max-width: 1800px;
+  margin: 0 auto;
+  padding: 24px;
+  height: calc(100vh - 48px);
+}
+
+@media (max-width: 1024px) {
+  .container {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+}
+
+/* 播放器区域 */
+.player-section {
+  background: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.player-wrapper {
+  position: relative;
+  width: 100%;
+  background: #000;
+  aspect-ratio: 16 / 9;
+}
+
+.video-js {
+  width: 100%;
+  height: 100%;
+}
+
+/* 自定义Video.js皮肤 */
+.video-js .vjs-control-bar {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+}
+
+.video-js .vjs-big-play-button {
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  line-height: 60px;
+  margin-left: -30px;
+  margin-top: -30px;
+}
+
+/* 播放器信息区域 */
+.player-info {
+  padding: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.channel-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.error-message {
+  color: var(--error-color);
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+/* 播放器控制区域 */
+.player-controls {
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* 频道列表区域 */
+.channels-section {
+  background: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* 搜索框 */
+.search-box {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  gap: 8px;
+}
+
+.search-box input {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  background: var(--background-color);
+  font-size: 15px;
+  color: var(--text-color);
+}
+
+.search-box input::placeholder {
+  color: var(--text-secondary);
+}
+
+/* 分类标签 */
+.category-tabs {
+  display: flex;
+  padding: 12px 16px;
+  gap: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.category-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.category-tab {
+  padding: 6px 12px;
+  border-radius: 14px;
+  background: var(--background-color);
+  color: var(--text-color);
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.category-tab.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+/* 频道列表 */
+.channels-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.channel-card {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 8px;
+}
+
+.channel-card:hover {
+  background: var(--background-color);
+}
+
+.channel-card.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+.channel-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 8px;
+  margin-right: 12px;
+}
+
+.channel-info {
+  flex: 1;
+}
+
+.channel-name {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.channel-sources {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.channel-card.active .channel-sources {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* 按钮样式 */
+.btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: var(--background-color);
+  color: var(--primary-color);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  background: #E5E5EA;
+}
+
+.btn.btn-secondary {
+  background: var(--primary-color);
+  color: white;
+}
+
+.btn.btn-secondary:hover {
+  background: #0056b3;
+}
+
+/* 加载状态 */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 16px;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .container {
+    padding: 12px;
+    gap: 12px;
+  }
+  
+  .player-section,
+  .channels-section {
+    border-radius: 12px;
+  }
+  
+  .channel-card {
+    padding: 10px;
+  }
+  
+  .channel-logo {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* 硬件加速优化 */
+.video-js,
+.player-wrapper,
+.channel-card {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}

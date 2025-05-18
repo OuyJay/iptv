@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>呆萌恐龙IPTV - 简约好用的电视直播</title>
+  <meta name="description" content="一个简约可爱的电视直播网站，支持多种直播源">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦖</text></svg>">
+  
+  <!-- 引入Video.js CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/video.js@7.20.3/dist/video-js.min.css" rel="stylesheet">
+  <!-- 自定义CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- 网站标题栏 -->
+  <header class="site-header">
+    <div class="logo">
+      <span class="logo-icon">🦖</span>
+      <h1>呆萌恐龙IPTV</h1>
+    </div>
+    <div class="header-controls">
+      <button id="theme-toggle" class="btn btn-icon" title="切换主题">
+        <span class="icon">🌓</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- 频道列表区域 -->
+    <section class="channels-section">
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="搜索频道...">
+        <button id="search-btn" class="btn">
+          <span class="icon">🔍</span>
+        </button>
+      </div>
+      
+      <div id="category-tabs" class="category-tabs">
+        <!-- 分类标签将通过JavaScript动态生成 -->
+      </div>
+      
+      <div id="channels-list" class="channels-list">
+        <!-- 频道列表将通过JavaScript动态生成 -->
+      </div>
+    </section>
+
+    <!-- 播放器区域 -->
+    <section class="player-section">
+      <div class="player-wrapper" id="player-wrapper">
+        <video id="player" 
+               class="video-js vjs-default-skin vjs-big-play-centered"
+               playsinline
+               webkit-playsinline>
+          <p class="vjs-no-js">
+            要观看此视频，请启用JavaScript并考虑升级到支持HTML5视频的浏览器
+          </p>
+        </video>
+        
+        <div id="loading-overlay" class="loading-overlay">
+          <div class="loading-spinner"></div>
+          <div class="loading-text">加载中...</div>
+        </div>
+      </div>
+      
+      <div class="player-info">
+        <div class="info-header">
+          <h2 id="channel-title" class="channel-title">请选择频道</h2>
+          <div class="player-controls">
+            <button id="retry-btn" class="btn btn-icon" title="重试">
+              <span class="icon">🔄</span>
+            </button>
+            <button id="source-btn" class="btn btn-icon" title="切换源">
+              <span class="icon">📡</span>
+            </button>
+            <button id="fullscreen-btn" class="btn btn-icon" title="全屏">
+              <span class="icon">⛶</span>
+            </button>
+          </div>
+        </div>
+        <div id="error-message" class="error-message" style="display: none;"></div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="site-footer">
+    <p>© 2023 呆萌恐龙IPTV - Made with 💖</p>
+  </footer>
+  
+  <!-- 引入必要的库 -->
+  <script src="https://cdn.jsdelivr.net/npm/video.js@7.20.3/dist/video.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.12/dist/hls.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flv.js@1.6.2/dist/flv.min.js"></script>
+  <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
+  
+  <!-- 自定义JavaScript -->
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -19,40 +19,53 @@
             <h1>电视直播</h1>
         </header>
         
-        <div class="player-container">
-            <video id="videoPlayer" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto">
-                <p class="vjs-no-js">
-                    要观看此视频，请启用JavaScript并考虑升级到支持HTML5视频的浏览器
-                </p>
-            </video>
-        </div>
-        
-        <div class="controls">
-            <div class="channel-selector">
-                <select id="channelSelect" class="channel-select">
-                    <option value="" disabled selected>选择频道</option>
-                </select>
+        <div class="content-container">
+            <!-- 左侧播放器区域 -->
+            <div class="player-section">
+                <div class="player-container">
+                    <video id="videoPlayer" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto">
+                        <p class="vjs-no-js">
+                            要观看此视频，请启用JavaScript并考虑升级到支持HTML5视频的浏览器
+                        </p>
+                    </video>
+                </div>
+                
+                <!-- 播放器下方控制区 -->
+                <div class="player-controls">
+                    <div class="control-row">
+                        <div class="source-selector">
+                            <label for="sourceSelect">信号源:</label>
+                            <select id="sourceSelect" class="source-select">
+                                <option value="" disabled selected>选择信号源</option>
+                            </select>
+                        </div>
+                        
+                        <div class="quality-selector">
+                            <label for="qualitySelect">画质:</label>
+                            <select id="qualitySelect" class="quality-select">
+                                <option value="auto" selected>自动画质</option>
+                                <option value="high">高清</option>
+                                <option value="medium">标清</option>
+                                <option value="low">流畅</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
             
-            <div class="source-selector">
-                <select id="sourceSelect" class="source-select">
-                    <option value="" disabled selected>选择信号源</option>
-                </select>
+            <!-- 右侧频道列表区域 -->
+            <div class="channels-section">
+                <div class="channel-search">
+                    <select id="channelSelect" class="channel-select">
+                        <option value="" disabled selected>选择频道</option>
+                    </select>
+                </div>
+                
+                <div class="channel-list">
+                    <div class="category-tabs" id="categoryTabs"></div>
+                    <div class="channels-grid" id="channelsGrid"></div>
+                </div>
             </div>
-            
-            <div class="quality-selector">
-                <select id="qualitySelect" class="quality-select">
-                    <option value="auto" selected>自动画质</option>
-                    <option value="high">高清</option>
-                    <option value="medium">标清</option>
-                    <option value="low">流畅</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="channel-list">
-            <div class="category-tabs" id="categoryTabs"></div>
-            <div class="channels-grid" id="channelsGrid"></div>
         </div>
     </div>
 

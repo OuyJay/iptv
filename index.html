@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/UAParser.js/1.0.35/ua-parser.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -39,12 +40,16 @@
                             <li>升级到最新版Chrome、Firefox或Edge浏览器</li>
                             <li>iOS设备建议升级到iOS 10以上版本</li>
                             <li>Android设备建议使用Chrome浏览器</li>
-                            <li>已自动切换到HLS格式以提供最佳兼容性</li>
+                            <li>已自动切换到M3U8格式以提供最佳兼容性</li>
                         </ul>
                     </div>
                     <div id="error-message" class="browser-warning" style="display: none;">
                         <p>播放出现问题：<span id="error-detail"></span></p>
                         <ul id="error-solutions"></ul>
+                    </div>
+                    <div class="custom-url-input">
+                        <input type="text" id="custom-url" placeholder="输入自定义播放链接（支持m3u8/flv/mpd格式）" class="url-input">
+                        <button class="btn" id="play-custom-url">播放</button>
                     </div>
                     <div class="format-switcher">
                         <span>播放格式：</span>
@@ -84,13 +89,15 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // 浏览器和设备检测
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            const isOldiOS = isIOS && /OS [4-9]_\d/.test(navigator.userAgent);
-            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-            const isIE = /MSIE|Trident/.test(navigator.userAgent);
-            const isOldAndroid = /Android/.test(navigator.userAgent) && (/Android [1-4]/.test(navigator.userAgent));
-            const isLegacyBrowser = isOldiOS || isIE || isOldAndroid;
+            // 使用ua-parser-js进行浏览器检测
+            const parser = new UAParser();
+            const browserInfo = parser.getBrowser();
+            const osInfo = parser.getOS();
+            
+            const isOldSafari = browserInfo.name === 'Safari' && parseInt(browserInfo.version) <= 9;
+            const isOldIE = browserInfo.name === 'IE' && parseInt(browserInfo.version) <= 11;
+            const isOldAndroid = osInfo.name === 'Android' && parseInt(osInfo.version) <= 4;
+            const isLegacyBrowser = isOldSafari || isOldIE || isOldAndroid;
             
             // 检查浏览器兼容性
             const browserWarning = document.getElementById('browser-warning');
@@ -100,14 +107,14 @@
                 browserWarning.style.display = 'block';
                 const warnings = [];
                 
-                if (isOldiOS) {
-                    warnings.push('检测到iOS 9或更低版本，部分功能可能受限');
+                if (isOldSafari) {
+                    warnings.push('检测到iOS 9或更低版本Safari浏览器，将使用原生HLS播放器');
                 }
-                if (isIE) {
-                    warnings.push('检测到IE浏览器，不支持现代视频编码和MSE技术');
+                if (isOldIE) {
+                    warnings.push('检测到IE 11或更低版本，建议使用现代浏览器');
                 }
                 if (isOldAndroid) {
-                    warnings.push('检测到Android 4.4或更低版本，播放性能可能受限');
+                    warnings.push('检测到Android 4或更低版本，建议升级系统或使用Chrome浏览器');
                 }
                 
                 warningList.innerHTML = warnings.map(warning => `<li>${warning}</li>`).join('');
@@ -143,7 +150,7 @@
                 fluid: true,
                 html5: {
                     hls: {
-                        overrideNative: !isOldiOS && !isSafari,
+                        overrideNative: !isOldSafari,
                         enableLowInitialPlaylist: true,
                         smoothQualityChange: true,
                         handleManifestRedirects: true,
@@ -185,6 +192,8 @@
             const errorMessage = document.getElementById('error-message');
             const errorDetail = document.getElementById('error-detail');
             const errorSolutions = document.getElementById('error-solutions');
+            const customUrlInput = document.getElementById('custom-url');
+            const playCustomUrlButton = document.getElementById('play-custom-url');
             
             // 当前选择的格式
             let currentFormat = isLegacyBrowser ? 'm3u8' : 'flv';
@@ -220,19 +229,18 @@
                 }
             }
             
-            function playStream(button) {
+            function playStream(url, name = '自定义频道') {
                 hideError();
-                const streamUrl = getStreamUrl(button);
-                const streamType = getStreamType(streamUrl);
+                const streamType = getStreamType(url);
                 
                 // 更新播放源
                 player.src({
-                    src: streamUrl,
+                    src: url,
                     type: streamType
                 });
                 
                 // 更新频道名称
-                channelName.textContent = button.dataset.name;
+                channelName.textContent = name;
                 
                 // 更新状态
                 statusIndicator.textContent = '连接中...';
@@ -324,7 +332,7 @@
                     // 重新加载当前频道
                     const activeChannel = document.querySelector('.channel-btn.active');
                     if (activeChannel) {
-                        playStream(activeChannel);
+                        playStream(getStreamUrl(activeChannel), activeChannel.dataset.name);
                     }
                 });
             });
@@ -334,8 +342,51 @@
                 button.addEventListener('click', function() {
                     channelButtons.forEach(btn => btn.classList.remove('active'));
                     button.classList.add('active');
-                    playStream(button);
+                    playStream(getStreamUrl(button), button.dataset.name);
                 });
+            });
+            
+            // 自定义URL播放事件
+            playCustomUrlButton.addEventListener('click', function() {
+                const url = customUrlInput.value.trim();
+                if (!url) {
+                    showError('请输入播放链接', ['输入有效的播放链接后重试']);
+                    return;
+                }
+                
+                // 检查URL格式
+                const extension = url.split('.').pop().toLowerCase();
+                if (!['m3u8', 'flv', 'mpd'].includes(extension)) {
+                    showError('不支持的视频格式', [
+                        '仅支持m3u8、flv、mpd格式',
+                        '请检查链接格式是否正确'
+                    ]);
+                    return;
+                }
+                
+                // 如果是旧版浏览器，只允许播放m3u8
+                if (isLegacyBrowser && extension !== 'm3u8') {
+                    showError('浏览器兼容性限制', [
+                        '当前浏览器仅支持m3u8格式',
+                        '请使用m3u8格式的播放链接'
+                    ]);
+                    return;
+                }
+                
+                // 更新当前格式
+                currentFormat = extension === 'mpd' ? 'dash' : extension;
+                formatButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.format === currentFormat) {
+                        btn.classList.add('active');
+                    }
+                });
+                
+                // 清除频道选中状态
+                channelButtons.forEach(btn => btn.classList.remove('active'));
+                
+                // 播放自定义链接
+                playStream(url);
             });
             
             // 默认播放第一个频道

@@ -2,396 +2,248 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>电视直播</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/UAParser.js/1.0.35/ua-parser.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>直播播放诊断（iOS9）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: -apple-system, "Helvetica Neue", sans-serif;
+            background: #f5f5f5;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+        }
+        .player-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            margin-bottom: 20px;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        #player {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .diagnose-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        #url-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+            background: #f8f8f8;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background: #1976D2;
+        }
+        .status {
+            text-align: left;
+            color: #333;
+            font-size: 12px;
+            margin-top: 10px;
+            white-space: pre-wrap; /* 保留换行 */
+        }
+        .error { color: #dc3545; }
+        .success { color: #28a745; }
+        .info { color: #666; }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>电视直播</h1>
-        </header>
-        
-        <main>
-            <div class="player-container">
-                <div id="video-wrapper">
-                    <video-js id="video-player" class="vjs-default-skin vjs-big-play-centered" controls preload="auto" autoplay>
-                        <p class="vjs-no-js">
-                            您的浏览器不支持HTML5视频播放，可能的原因：<br>
-                            1. JavaScript未启用 - 请在浏览器设置中启用JavaScript<br>
-                            2. 浏览器版本过低 - 推荐使用：<br>
-                            · Chrome/Edge/Firefox最新版<br>
-                            · iOS 10+版本的Safari<br>
-                            · Android 5.0+的Chrome
-                        </p>
-                    </video-js>
-                </div>
-                <div class="player-info">
-                    <h2>正在播放: <span id="channel-name">TVB Plus</span></h2>
-                    <p class="stream-status">直播状态: <span id="status-indicator">连接中...</span></p>
-                    <div id="browser-warning" class="browser-warning" style="display: none;">
-                        <p>检测到您的浏览器可能存在兼容性问题：</p>
-                        <ul id="warning-list"></ul>
-                        <p>建议采取以下措施：</p>
-                        <ul>
-                            <li>升级到最新版Chrome、Firefox或Edge浏览器</li>
-                            <li>iOS设备建议升级到iOS 10以上版本</li>
-                            <li>Android设备建议使用Chrome浏览器</li>
-                            <li>已自动切换到M3U8格式以提供最佳兼容性</li>
-                        </ul>
-                    </div>
-                    <div id="error-message" class="browser-warning" style="display: none;">
-                        <p>播放出现问题：<span id="error-detail"></span></p>
-                        <ul id="error-solutions"></ul>
-                    </div>
-                    <div class="custom-url-input">
-                        <input type="text" id="custom-url" placeholder="输入自定义播放链接（支持m3u8/flv/mpd格式）" class="url-input">
-                        <button class="btn" id="play-custom-url">播放</button>
-                    </div>
-                    <div class="format-switcher">
-                        <span>播放格式：</span>
-                        <button class="btn format-btn" data-format="m3u8">M3U8</button>
-                        <button class="btn format-btn" data-format="flv">FLV</button>
-                        <button class="btn format-btn" data-format="dash">DASH</button>
-                    </div>
-                    <div class="channel-switcher">
-                        <button class="btn channel-btn" 
-                            data-url="https://rthktv33-live.akamaized.net/hls/live/2101641/RTHKTV33/master.m3u8" 
-                            data-dash-url="http://ali.hlspull.yximgs.com/live/qwt_feicui.mpd"
-                            data-flv-url="http://ali.hlspull.yximgs.com/live/qwt_feicui.flv"
-                            data-name="TVB Plus">TVB Plus</button>
-                        <button class="btn channel-btn" 
-                            data-url="https://rthktv33-live.akamaized.net/hls/live/2101641/RTHKTV33/master.m3u8" 
-                            data-dash-url="http://ali.hlspull.yximgs.com/live/qwt_feicui.mpd"
-                            data-flv-url="http://ali.hlspull.yximgs.com/live/qwt_feicui.flv"
-                            data-name="翡翠台">翡翠台</button>
-                    </div>
-                </div>
-            </div>
-        </main>
-        
-        <footer>
-            <p>&copy; 2023 电视直播 | 为您提供优质的直播体验</p>
-        </footer>
+    <div class="header">
+        <h1>直播播放诊断工具</h1>
+        <p>iOS9专用（解决"无支持源"问题）</p>
     </div>
-    
-    <!-- 播放器相关库 -->
-    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-hls.js@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-dash@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flv.js@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/videojs-flvjs-es6@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dash.js@latest"></script>
-    
+
+    <div class="player-container">
+        <video id="player" controls preload="none"></video>
+    </div>
+
+    <div class="diagnose-box">
+        <input type="text" id="url-input" 
+               value="http://play1-qk.nmtv.cn/live/1686561195713372.m3u8" 
+               placeholder="输入m3u8地址" 
+               readonly>
+        <button onclick="startDiagnose()">开始诊断并播放</button>
+        <div class="status" id="status"></div>
+    </div>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // 使用ua-parser-js进行浏览器检测
-            const parser = new UAParser();
-            const browserInfo = parser.getBrowser();
-            const osInfo = parser.getOS();
+        var player = document.getElementById('player');
+        var statusEl = document.getElementById('status');
+        var targetUrl = document.getElementById('url-input').value;
+
+        function startDiagnose() {
+            statusEl.className = 'status info';
+            statusEl.textContent = '📋 开始诊断...';
             
-            const isOldSafari = browserInfo.name === 'Safari' && parseInt(browserInfo.version) <= 9;
-            const isOldIE = browserInfo.name === 'IE' && parseInt(browserInfo.version) <= 11;
-            const isOldAndroid = osInfo.name === 'Android' && parseInt(osInfo.version) <= 4;
-            const isLegacyBrowser = isOldSafari || isOldIE || isOldAndroid;
-            
-            // 检查浏览器兼容性
-            const browserWarning = document.getElementById('browser-warning');
-            const warningList = document.getElementById('warning-list');
-            
-            if (isLegacyBrowser) {
-                browserWarning.style.display = 'block';
-                const warnings = [];
-                
-                if (isOldSafari) {
-                    warnings.push('检测到iOS 9或更低版本Safari浏览器，将使用原生HLS播放器');
-                }
-                if (isOldIE) {
-                    warnings.push('检测到IE 11或更低版本，建议使用现代浏览器');
-                }
-                if (isOldAndroid) {
-                    warnings.push('检测到Android 4或更低版本，建议升级系统或使用Chrome浏览器');
-                }
-                
-                warningList.innerHTML = warnings.map(warning => `<li>${warning}</li>`).join('');
-                
-                // 自动选择M3U8格式（最大兼容性）
-                currentFormat = 'm3u8';
-                document.querySelectorAll('.format-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                    if (btn.dataset.format === 'm3u8') {
-                        btn.classList.add('active');
-                    }
-                });
-            }
-            
-            // 检查JavaScript是否启用
-            if (typeof window.videojs === 'undefined') {
-                console.error('VideoJS未加载，请检查JavaScript是否启用');
-                showError('JavaScript未正确加载', [
-                    '请检查浏览器是否启用了JavaScript',
-                    '尝试刷新页面',
-                    '清除浏览器缓存后重试'
-                ]);
+            // 步骤1：验证URL格式
+            if (!validateUrl(targetUrl)) {
+                statusEl.textContent += '\n❌ 步骤1/4：URL格式错误（需以http://或https://开头且以.m3u8结尾）';
                 return;
             }
-            
-            // 注册FLV插件
-            if (window.videojs && window.videojsFlvjs) {
-                videojs.registerPlugin('flvjs', window.videojsFlvjs);
-            }
-            
-            // 初始化video.js播放器
-            const player = videojs('video-player', {
-                fluid: true,
-                html5: {
-                    hls: {
-                        overrideNative: !isOldSafari,
-                        enableLowInitialPlaylist: true,
-                        smoothQualityChange: true,
-                        handleManifestRedirects: true,
-                        allowSeeksWithinUnsafeLiveWindow: true
-                    },
-                    flvjs: {
-                        mediaDataSource: {
-                            isLive: true,
-                            cors: true,
-                            withCredentials: false
-                        },
-                        config: {
-                            enableStashBuffer: false,
-                            stashInitialSize: 128
-                        }
-                    }
-                },
-                techOrder: isLegacyBrowser ? ['html5'] : ['html5', 'flvjs'],
-                sources: [{
-                    src: '',
-                    type: ''
-                }],
-                controls: true,
-                autoplay: true,
-                preload: 'auto',
-                errorDisplay: true,
-                loadingSpinner: true
-            });
-            
-            // 加载插件
-            if (!isLegacyBrowser && window.videojs && window.videojsFlvjs) {
-                player.flvjs();
-            }
-            
-            const statusIndicator = document.getElementById('status-indicator');
-            const channelName = document.getElementById('channel-name');
-            const channelButtons = document.querySelectorAll('.channel-btn');
-            const formatButtons = document.querySelectorAll('.format-btn');
-            const errorMessage = document.getElementById('error-message');
-            const errorDetail = document.getElementById('error-detail');
-            const errorSolutions = document.getElementById('error-solutions');
-            const customUrlInput = document.getElementById('custom-url');
-            const playCustomUrlButton = document.getElementById('play-custom-url');
-            
-            // 当前选择的格式
-            let currentFormat = isLegacyBrowser ? 'm3u8' : 'flv';
-            
-            function showError(message, solutions) {
-                errorDetail.textContent = message;
-                errorSolutions.innerHTML = solutions.map(solution => `<li>${solution}</li>`).join('');
-                errorMessage.style.display = 'block';
-                statusIndicator.textContent = '播放错误';
-                statusIndicator.className = 'error';
-            }
-            
-            function hideError() {
-                errorMessage.style.display = 'none';
-            }
-            
-            function getStreamType(url) {
-                const extension = url.split('.').pop().toLowerCase();
-                switch(extension) {
-                    case 'flv': return 'video/x-flv';
-                    case 'mpd': return 'application/dash+xml';
-                    case 'm3u8': return 'application/x-mpegURL';
-                    default: return 'application/x-mpegURL';
+            statusEl.textContent += '\n✅ 步骤1/4：URL格式验证通过';
+
+            // 步骤2：检测网络连通性
+            testNetwork(function(isOnline) {
+                if (!isOnline) {
+                    statusEl.textContent += '\n❌ 步骤2/4：网络连接失败（设备无法访问互联网）';
+                    return;
                 }
-            }
-            
-            function getStreamUrl(button) {
-                switch(currentFormat) {
-                    case 'flv': return button.dataset.flvUrl;
-                    case 'dash': return button.dataset.dashUrl;
-                    case 'm3u8': return button.dataset.url;
-                    default: return button.dataset.url;
-                }
-            }
-            
-            function playStream(url, name = '自定义频道') {
-                hideError();
-                const streamType = getStreamType(url);
-                
-                // 更新播放源
-                player.src({
-                    src: url,
-                    type: streamType
-                });
-                
-                // 更新频道名称
-                channelName.textContent = name;
-                
-                // 更新状态
-                statusIndicator.textContent = '连接中...';
-                statusIndicator.className = 'connecting';
-                
-                // 播放
-                player.play().catch(function(error) {
-                    console.error('播放错误:', error);
-                    handlePlayError(error);
-                });
-            }
-            
-            function handlePlayError(error) {
-                let errorMessage = '播放失败';
-                let solutions = [];
-                
-                switch(error.name) {
-                    case 'NotSupportedError':
-                        errorMessage = '当前浏览器不支持该视频格式';
-                        solutions = [
-                            '尝试切换到M3U8格式',
-                            '升级到最新版浏览器',
-                            '使用Chrome、Firefox或Edge浏览器'
-                        ];
-                        // 自动切换到M3U8格式
-                        if (currentFormat !== 'm3u8') {
-                            currentFormat = 'm3u8';
-                            document.querySelector('.format-btn[data-format="m3u8"]').click();
-                        }
-                        break;
-                    case 'NotAllowedError':
-                        errorMessage = '浏览器禁止自动播放';
-                        solutions = [
-                            '点击播放按钮手动开始播放',
-                            '检查浏览器自动播放设置'
-                        ];
-                        break;
-                    case 'NetworkError':
-                        errorMessage = '网络连接错误';
-                        solutions = [
-                            '检查网络连接',
-                            '尝试刷新页面',
-                            '稍后重试'
-                        ];
-                        break;
-                    default:
-                        solutions = [
-                            '尝试切换播放格式',
-                            '刷新页面重试',
-                            '检查网络连接'
-                        ];
-                }
-                
-                showError(errorMessage, solutions);
-            }
-            
-            // 播放状态监听
-            player.on('playing', function() {
-                statusIndicator.textContent = '正在播放';
-                statusIndicator.className = 'playing';
-                hideError();
-            });
-            
-            player.on('waiting', function() {
-                statusIndicator.textContent = '缓冲中...';
-                statusIndicator.className = 'connecting';
-            });
-            
-            player.on('error', function() {
-                const error = player.error();
-                handlePlayError(error);
-            });
-            
-            // 格式切换按钮事件
-            formatButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    if (isLegacyBrowser && button.dataset.format !== 'm3u8') {
-                        showError('浏览器不支持该格式', [
-                            '当前浏览器仅支持M3U8格式',
-                            '请升级浏览器以使用其他格式'
-                        ]);
+                statusEl.textContent += '\n✅ 步骤2/4：网络连通性正常';
+
+                // 步骤3：检查源服务器响应
+                checkServerResponse(function(responseOk, statusCode) {
+                    if (!responseOk) {
+                        statusEl.textContent += `\n❌ 步骤3/4：服务器返回异常状态码 ${statusCode}`;
                         return;
                     }
-                    
-                    formatButtons.forEach(btn => btn.classList.remove('active'));
-                    button.classList.add('active');
-                    currentFormat = button.dataset.format;
-                    
-                    // 重新加载当前频道
-                    const activeChannel = document.querySelector('.channel-btn.active');
-                    if (activeChannel) {
-                        playStream(getStreamUrl(activeChannel), activeChannel.dataset.name);
-                    }
+                    statusEl.textContent += '\n✅ 步骤3/4：服务器响应正常';
+
+                    // 步骤4：解析HLS流内容
+                    parseHlsManifest(function(valid, errorMsg) {
+                        if (!valid) {
+                            statusEl.textContent += `\n❌ 步骤4/4：HLS流解析失败 - ${errorMsg}`;
+                            return;
+                        }
+                        statusEl.textContent += '\n✅ 步骤4/4：HLS流内容有效';
+
+                        // 最终播放
+                        playStream(targetUrl);
+                    });
                 });
             });
+        }
+
+        function validateUrl(url) {
+            return /^https?:\/\/.*\.m3u8$/i.test(url);
+        }
+
+        function testNetwork(callback) {
+            var testXhr = new XMLHttpRequest();
+            testXhr.open('HEAD', 'https://www.baidu.com', true); // 测试百度验证网络
+            testXhr.timeout = 5000;
+            testXhr.onload = function() { callback(true); };
+            testXhr.onerror = function() { callback(false); };
+            testXhr.ontimeout = function() { callback(false); };
+            testXhr.send();
+        }
+
+        function checkServerResponse(callback) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('HEAD', targetUrl, true);
+            xhr.timeout = 10000;
+            xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_3_5 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13G36 Safari/601.1');
             
-            // 频道切换按钮事件
-            channelButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    channelButtons.forEach(btn => btn.classList.remove('active'));
-                    button.classList.add('active');
-                    playStream(getStreamUrl(button), button.dataset.name);
-                });
+            xhr.onload = function() {
+                callback(xhr.status >= 200 && xhr.status < 300, xhr.status);
+            };
+            xhr.onerror = function() { callback(false, '网络错误'); };
+            xhr.ontimeout = function() { callback(false, '超时'); };
+            xhr.send();
+        }
+
+        function parseHlsManifest(callback) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', targetUrl, true);
+            xhr.timeout = 15000;
+            xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_3_5 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13G36 Safari/601.1');
+            
+            xhr.onload = function() {
+                if (xhr.status !== 200) {
+                    callback(false, `服务器返回状态码 ${xhr.status}`);
+                    return;
+                }
+
+                var manifest = xhr.responseText;
+                // 检查是否包含#EXTM3U头
+                if (!manifest.includes('#EXTM3U')) {
+                    callback(false, '缺少HLS标准头#EXTM3U');
+                    return;
+                }
+
+                // 检查是否有TS分片（关键验证）
+                if (!manifest.match(/\.ts\b/i)) {
+                    callback(false, '未找到TS分片文件（HLS流不完整）');
+                    return;
+                }
+
+                // 检查编码是否为H.264（iOS9仅支持）
+                if (!manifest.match(/#EXT-X-STREAM-INF:.*CODECS=".*avc1.*"/i)) {
+                    callback(false, '视频编码非H.264（iOS9仅支持H.264）');
+                    return;
+                }
+
+                callback(true);
+            };
+
+            xhr.onerror = function() {
+                callback(false, '网络错误（无法下载HLS流）');
+            };
+
+            xhr.ontimeout = function() {
+                callback(false, '下载超时（15秒未完成）');
+            };
+
+            xhr.send();
+        }
+
+        function playStream(url) {
+            player.src = url;
+            player.load();
+
+            player.onerror = function() {
+                var errorCode = player.error ? player.error.code : '未知';
+                var errorDetails = [
+                    'MEDIA_ERR_ABORTED (1): 播放中断',
+                    'MEDIA_ERR_NETWORK (2): 网络问题',
+                    'MEDIA_ERR_DECODE (3): 解码失败',
+                    'MEDIA_ERR_SRC_NOT_SUPPORTED (4): 源不支持'
+                ].find(d => d.startsWith(`MEDIA_ERR_${errorCode}`)) || '未知错误';
+                
+                statusEl.className = 'status error';
+                statusEl.textContent = `❌ 播放失败（错误码${errorCode}）：${errorDetails}\n排查建议：\n1. 确认源地址有效（用电脑浏览器直接访问）\n2. 检查网络稳定性\n3. 联系源提供方确认H.264编码`;
+            };
+
+            player.play().then(function() {
+                statusEl.className = 'status success';
+                statusEl.textContent = '✅ 播放成功！如果画面卡顿请检查网络';
+            }).catch(function(error) {
+                statusEl.className = 'status error';
+                statusEl.textContent = `❌ 播放错误：${error.message}`;
             });
-            
-            // 自定义URL播放事件
-            playCustomUrlButton.addEventListener('click', function() {
-                const url = customUrlInput.value.trim();
-                if (!url) {
-                    showError('请输入播放链接', ['输入有效的播放链接后重试']);
-                    return;
-                }
-                
-                // 检查URL格式
-                const extension = url.split('.').pop().toLowerCase();
-                if (!['m3u8', 'flv', 'mpd'].includes(extension)) {
-                    showError('不支持的视频格式', [
-                        '仅支持m3u8、flv、mpd格式',
-                        '请检查链接格式是否正确'
-                    ]);
-                    return;
-                }
-                
-                // 如果是旧版浏览器，只允许播放m3u8
-                if (isLegacyBrowser && extension !== 'm3u8') {
-                    showError('浏览器兼容性限制', [
-                        '当前浏览器仅支持m3u8格式',
-                        '请使用m3u8格式的播放链接'
-                    ]);
-                    return;
-                }
-                
-                // 更新当前格式
-                currentFormat = extension === 'mpd' ? 'dash' : extension;
-                formatButtons.forEach(btn => {
-                    btn.classList.remove('active');
-                    if (btn.dataset.format === currentFormat) {
-                        btn.classList.add('active');
-                    }
-                });
-                
-                // 清除频道选中状态
-                channelButtons.forEach(btn => btn.classList.remove('active'));
-                
-                // 播放自定义链接
-                playStream(url);
-            });
-            
-            // 默认播放第一个频道
-            channelButtons[0].click();
-        });
+        }
     </script>
 </body>
 </html>
+    

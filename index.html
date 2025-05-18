@@ -1,99 +1,88 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>呆萌恐龙IPTV - 简约好用的电视直播</title>
-  <meta name="description" content="一个简约可爱的电视直播网站，支持多种直播源">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦖</text></svg>">
-  
-  <!-- 引入Video.js CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/video.js@7.20.3/dist/video-js.min.css" rel="stylesheet">
-  <!-- 自定义CSS -->
-  <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TVB Plus 直播</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
-  <!-- 网站标题栏 -->
-  <header class="site-header">
-    <div class="logo">
-      <span class="logo-icon">🦖</span>
-      <h1>呆萌恐龙IPTV</h1>
-    </div>
-    <div class="header-controls">
-      <button id="theme-toggle" class="btn btn-icon" title="切换主题">
-        <span class="icon">🌓</span>
-      </button>
-    </div>
-  </header>
-
-  <div class="container">
-    <!-- 频道列表区域 -->
-    <section class="channels-section">
-      <div class="search-box">
-        <input type="text" id="search-input" placeholder="搜索频道...">
-        <button id="search-btn" class="btn">
-          <span class="icon">🔍</span>
-        </button>
-      </div>
-      
-      <div id="category-tabs" class="category-tabs">
-        <!-- 分类标签将通过JavaScript动态生成 -->
-      </div>
-      
-      <div id="channels-list" class="channels-list">
-        <!-- 频道列表将通过JavaScript动态生成 -->
-      </div>
-    </section>
-
-    <!-- 播放器区域 -->
-    <section class="player-section">
-      <div class="player-wrapper" id="player-wrapper">
-        <video id="player" 
-               class="video-js vjs-default-skin vjs-big-play-centered"
-               playsinline
-               webkit-playsinline>
-          <p class="vjs-no-js">
-            要观看此视频，请启用JavaScript并考虑升级到支持HTML5视频的浏览器
-          </p>
-        </video>
+    <div class="container">
+        <header>
+            <h1>TVB Plus 直播</h1>
+        </header>
         
-        <div id="loading-overlay" class="loading-overlay">
-          <div class="loading-spinner"></div>
-          <div class="loading-text">加载中...</div>
-        </div>
-      </div>
-      
-      <div class="player-info">
-        <div class="info-header">
-          <h2 id="channel-title" class="channel-title">请选择频道</h2>
-          <div class="player-controls">
-            <button id="retry-btn" class="btn btn-icon" title="重试">
-              <span class="icon">🔄</span>
-            </button>
-            <button id="source-btn" class="btn btn-icon" title="切换源">
-              <span class="icon">📡</span>
-            </button>
-            <button id="fullscreen-btn" class="btn btn-icon" title="全屏">
-              <span class="icon">⛶</span>
-            </button>
-          </div>
-        </div>
-        <div id="error-message" class="error-message" style="display: none;"></div>
-      </div>
-    </section>
-  </div>
-
-  <footer class="site-footer">
-    <p>© 2023 呆萌恐龙IPTV - Made with 💖</p>
-  </footer>
-  
-  <!-- 引入必要的库 -->
-  <script src="https://cdn.jsdelivr.net/npm/video.js@7.20.3/dist/video.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.12/dist/hls.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flv.js@1.6.2/dist/flv.min.js"></script>
-  <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
-  
-  <!-- 自定义JavaScript -->
-  <script src="js/app.js"></script>
+        <main>
+            <div class="player-container">
+                <div id="video-wrapper">
+                    <video id="video-player" controls autoplay></video>
+                </div>
+                <div class="player-info">
+                    <h2>正在播放: TVB Plus</h2>
+                    <p class="stream-status">直播状态: <span id="status-indicator">连接中...</span></p>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2023 TVB Plus 直播 | 为您提供优质的直播体验</p>
+        </footer>
+    </div>
+    
+    <!-- 引入hls.js库用于播放m3u8格式的直播流 -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.getElementById('video-player');
+            const statusIndicator = document.getElementById('status-indicator');
+            const streamUrl = 'https://live.tvfix.org/live/tvbplus/index.m3u8';
+            
+            if (Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(streamUrl);
+                hls.attachMedia(video);
+                
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    video.play();
+                    statusIndicator.textContent = '正在播放';
+                    statusIndicator.className = 'status-playing';
+                });
+                
+                hls.on(Hls.Events.ERROR, function(event, data) {
+                    if (data.fatal) {
+                        statusIndicator.textContent = '连接错误';
+                        statusIndicator.className = 'status-error';
+                        switch(data.type) {
+                            case Hls.ErrorTypes.NETWORK_ERROR:
+                                hls.startLoad();
+                                break;
+                            case Hls.ErrorTypes.MEDIA_ERROR:
+                                hls.recoverMediaError();
+                                break;
+                            default:
+                                hls.destroy();
+                                break;
+                        }
+                    }
+                });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = streamUrl;
+                video.addEventListener('loadedmetadata', function() {
+                    video.play();
+                    statusIndicator.textContent = '正在播放';
+                    statusIndicator.className = 'status-playing';
+                });
+                
+                video.addEventListener('error', function() {
+                    statusIndicator.textContent = '连接错误';
+                    statusIndicator.className = 'status-error';
+                });
+            } else {
+                statusIndicator.textContent = '浏览器不支持';
+                statusIndicator.className = 'status-error';
+            }
+        });
+    </script>
 </body>
 </html>

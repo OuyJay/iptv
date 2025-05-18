@@ -1,0 +1,137 @@
+/* 全局样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #1a1a1a;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    background-color: #e74c3c;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5em;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* 播放器容器 */
+.player-container {
+    background-color: #2c3e50;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    margin-bottom: 30px;
+}
+
+#video-wrapper {
+    width: 100%;
+    background-color: #000;
+    position: relative;
+    padding-top: 56.25%; /* 16:9 宽高比 */
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+#video-player {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* 播放器信息 */
+.player-info {
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.player-info h2 {
+    font-size: 1.8em;
+    margin-bottom: 10px;
+    color: #ecf0f1;
+}
+
+.stream-status {
+    font-size: 1.1em;
+    color: #bdc3c7;
+}
+
+#status-indicator {
+    font-weight: bold;
+}
+
+.status-playing {
+    color: #2ecc71;
+}
+
+.status-error {
+    color: #e74c3c;
+}
+
+/* 页脚 */
+footer {
+    text-align: center;
+    padding: 20px 0;
+    color: #7f8c8d;
+    border-top: 1px solid #34495e;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    header {
+        padding: 15px 0;
+        margin-bottom: 20px;
+    }
+    
+    header h1 {
+        font-size: 2em;
+    }
+    
+    .player-container {
+        padding: 15px;
+    }
+    
+    .player-info h2 {
+        font-size: 1.5em;
+    }
+}
+
+/* 控件样式优化 */
+#video-player::-webkit-media-controls {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+#video-player::-webkit-media-controls-panel {
+    display: flex !important;
+    opacity: 1 !important;
+}

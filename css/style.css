@@ -1,0 +1,240 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: #121212;
+    color: #fff;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+a {
+    color: #4fc3f7;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+select, button {
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #555;
+    background: #2a2a2a;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Loading Screen */
+.loading-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #121212;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    border-top: 4px solid #4fc3f7;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    font-size: 18px;
+    color: #ddd;
+}
+
+/* Header */
+header {
+    padding: 15px 20px;
+    background-color: #1a1a1a;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+header h1 {
+    font-size: 24px;
+    font-weight: 500;
+    color: #4fc3f7;
+}
+
+/* Main Container */
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Player Container */
+.player-container {
+    width: 100%;
+    margin: 20px 0;
+    background-color: #000;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+}
+
+.video-js {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Controls */
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.channel-selector,
+.source-selector,
+.quality-selector {
+    flex: 1;
+    min-width: 150px;
+}
+
+/* Channel List */
+.channel-list {
+    margin-top: 30px;
+}
+
+.category-tabs {
+    display: flex;
+    overflow-x: auto;
+    margin-bottom: 20px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+.category-tab {
+    padding: 10px 15px;
+    background-color: #2a2a2a;
+    margin-right: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.2s;
+}
+
+.category-tab:hover {
+    background-color: #3a3a3a;
+}
+
+.category-tab.active {
+    background-color: #4fc3f7;
+    color: #121212;
+}
+
+.channels-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px;
+}
+
+.channel-item {
+    background-color: #2a2a2a;
+    padding: 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.channel-item:hover {
+    background-color: #3a3a3a;
+    transform: translateY(-3px);
+}
+
+.channel-item.active {
+    background-color: #4fc3f7;
+    color: #121212;
+}
+
+.channel-logo {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 10px;
+    display: block;
+    object-fit: contain;
+}
+
+.channel-name {
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #1a1a1a;
+    color: #888;
+    font-size: 12px;
+    margin-top: 40px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .controls {
+        flex-direction: column;
+    }
+    
+    .channel-selector,
+    .source-selector,
+    .quality-selector {
+        width: 100%;
+    }
+    
+    .channels-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+    
+    header h1 {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .channels-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+    
+    .channel-name {
+        font-size: 12px;
+    }
+    
+    .player-container {
+        padding-top: 62.5%; /* Slightly taller for mobile */
+    }
+} 

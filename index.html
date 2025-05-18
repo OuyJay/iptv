@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>电视直播</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/video.js@7.20.3/dist/video-js.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABs0lEQVQ4T6WTzUtUURjGf+85904j+QEOOrkStElaSLkIbN1CaCG4aNGqjf+A9V9EC7dBixYtWgVCiwSDaFFC0EIUFJQiELKxGe+9574tzsy9jVMTRC/cxTnn/p7n/T7eI9y8EZWb+V9AVRj7u4inXX/h0upOgJYHbwFh9Nkh0mw9tWiBVlJrh0SqHlweI01HUYvWeHyxg7MzS0kuVeS7tVZrzbCGI5XVRGsSoi2I1iHefvz+5pqD93KMXBgyIcDlj/n81GyOLjVTHQjNTyC9AiOQo+J+wgQ63jygf+YFw6MzuGSV4S9ddL5/Sf/xNPH8IiRJ1pELUlEdkYmK6+qDLvqu3eLas310fLtH+0SUVlWkKUVCXsb3A8LQx/c8PM9DKYXEnuf18B0uTB2gZ+URwdM8VQcetVoYWDyfIO9TyAcUCz6FfI4gUEhlMF4Vs94b9Hz9RHLyPOG2VTwFTbUcOz/YRrF9B+FaDc/z8QMf51I8JaNaDMZZ8tZi0oy1dcPq2m/ixUXi3W50mmF0ijEGnWqM1lij/zqRRqQimUl5PPGVE5MTjM9+ZmzmCyuzc9nPBPwBDzOdNhafNjoAAAAASUVORK5CYII=" type="image/x-icon">
+</head>
+<body>
+    <div class="loading-container" id="loadingContainer">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">加载中...</div>
+    </div>
+
+    <div class="main-container" id="mainContainer" style="display: none;">
+        <header>
+            <h1>电视直播</h1>
+        </header>
+        
+        <div class="player-container">
+            <video id="videoPlayer" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto">
+                <p class="vjs-no-js">
+                    要观看此视频，请启用JavaScript并考虑升级到支持HTML5视频的浏览器
+                </p>
+            </video>
+        </div>
+        
+        <div class="controls">
+            <div class="channel-selector">
+                <select id="channelSelect" class="channel-select">
+                    <option value="" disabled selected>选择频道</option>
+                </select>
+            </div>
+            
+            <div class="source-selector">
+                <select id="sourceSelect" class="source-select">
+                    <option value="" disabled selected>选择信号源</option>
+                </select>
+            </div>
+            
+            <div class="quality-selector">
+                <select id="qualitySelect" class="quality-select">
+                    <option value="auto" selected>自动画质</option>
+                    <option value="high">高清</option>
+                    <option value="medium">标清</option>
+                    <option value="low">流畅</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="channel-list">
+            <div class="category-tabs" id="categoryTabs"></div>
+            <div class="channels-grid" id="channelsGrid"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>基于 GitHub Pages 搭建 | <a href="https://github.com/yourname/tv-live" target="_blank">开源项目</a></p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/video.js@7.20.3/dist/video.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-hls.js@latest/dist/videojs-contrib-hlsjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-quality-levels@latest/dist/videojs-contrib-quality-levels.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flv.js@latest/dist/flv.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/videojs-flvjs@latest/dist/videojs-flvjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dash.js@latest/dist/dash.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/videojs-dash@latest/dist/videojs-dash.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html> 
